@@ -71,7 +71,9 @@ def get_info_about_car(car_id: str) -> Car:
         car = Car(id=car_id)
 
         car.price = int(
-            "".join(soup.find("span", class_="offer-price__number").text.split()[0:-1])
+            "".join(
+                soup.find("span", class_="offer-price__number").text.split()[0:-1]
+            ).replace(",", ".")
         )
         car.ad_date_created = get_date_from_span(
             soup.find("span", class_="offer-meta__value").text
@@ -123,7 +125,7 @@ def get_date_from_span(date: str) -> datetime.datetime:
 
 
 def main():
-    db = Database()
+    db = Database("otomoto_cars.db")
 
     link_to_otomoto = "https://www.otomoto.pl/osobowe?search%5Bfilter_enum_country_origin%5D=usa&search%5Border%5D=created_at_first%3Adesc"
 
@@ -133,7 +135,7 @@ def main():
     for car_id in tqdm(cars_ids_from_otomoto, desc="Geeting info about car"):
         is_car_checked = db.checked_car_in_db(car_id)
         if is_car_checked == True:
-            continue
+            db.set_null_to_ad_date_finished(car_id)
         else:
             time.sleep(1)  # set time.sleep because otomoto blocks my IP
             car = get_info_about_car(car_id)

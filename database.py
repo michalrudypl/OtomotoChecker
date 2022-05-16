@@ -2,8 +2,8 @@ import sqlite3
 
 
 class Database:
-    def __init__(self) -> None:
-        self.con = sqlite3.connect("otomoto_cars.db")
+    def __init__(self, database) -> None:
+        self.con = sqlite3.connect(database)
         self.cur = self.con.cursor()
         self.cur.execute(
             """CREATE TABLE IF NOT EXISTS cars (
@@ -23,17 +23,21 @@ class Database:
         )
 
     def checked_car_in_db(self, car_id: str) -> bool:
+        self.cur = self.con.cursor()
         sql = "SELECT * FROM cars WHERE id=?"
         try:
-            res = self.cur.execute(sql, [car_id]).fetchall()
+            res = self.cur.execute(sql, [car_id]).fetchone()
             if res == []:
+                self.cur.close()
                 return False
             else:
+                self.cur.close()
                 return True
         except:
             self.cur.close()
 
     def insert_car(self, car) -> None:
+        self.cur = self.con.cursor()
         sql = """INSERT INTO cars (
                      id,
                      brand,
@@ -72,24 +76,39 @@ class Database:
                 ],
             )
             self.con.commit()
+            self.cur.close()
         except:
             self.cur.close()
 
     def get_cars_with_not_finished_ad(self) -> list:
+        self.cur = self.con.cursor()
         sql = "SELECT id FROM cars WHERE ad_date_finished is NULL"
 
         try:
             res = self.cur.execute(sql).fetchall()
+            self.cur.close()
             return [str(r[0]) for r in res]
         except:
             self.cur.close()
 
     def end_ad_of_car(self, cars_ids: list) -> None:
+        self.cur = self.con.cursor()
         sql = "UPDATE cars SET ad_date_finished = DateTime('now') WHERE id = ?"
 
         try:
             self.cur.executemany(sql, cars_ids)
             self.con.commit()
+            self.cur.close()
+        except:
+            self.cur.close()
 
+    def set_null_to_ad_date_finished(self, car_id: str) -> None:
+        self.cur = self.con.cursor()
+        sql = "UPDATE cars SET ad_date_finished = NULL WHERE id = ?"
+
+        try:
+            self.cur.executemany(sql, [car_id])
+            self.con.commit()
+            self.cur.close()
         except:
             self.cur.close()
