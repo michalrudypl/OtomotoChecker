@@ -125,9 +125,11 @@ def get_date_from_span(date: str) -> datetime.datetime:
 
 
 def main():
-    db = Database("otomoto_cars.db")
+    db = Database("test.db")
 
-    link_to_otomoto = "https://www.otomoto.pl/osobowe?search%5Bfilter_enum_country_origin%5D=usa&search%5Border%5D=created_at_first%3Adesc"
+    # link_to_otomoto = "https://www.otomoto.pl/osobowe?search%5Bfilter_enum_country_origin%5D=usa&search%5Border%5D=created_at_first%3Adesc"
+    link_to_otomoto = "https://www.otomoto.pl/osobowe?search%5Bfilter_float_price%3Ato%5D=2000"
+
 
     number_of_pages = get_number_of_pages(link_to_otomoto)
     cars_ids_from_otomoto = get_cars_id(number_of_pages, link_to_otomoto)
