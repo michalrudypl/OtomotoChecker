@@ -27,7 +27,7 @@ class Database:
         sql = "SELECT * FROM cars WHERE id=?"
         try:
             res = self.cur.execute(sql, [car_id]).fetchone()
-            if res == []:
+            if res == None:
                 self.cur.close()
                 return False
             else:
