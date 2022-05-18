@@ -104,10 +104,9 @@ class Database:
 
     def set_null_to_ad_date_finished(self, car_id: str) -> None:
         self.cur = self.con.cursor()
-        sql = "UPDATE cars SET ad_date_finished = NULL WHERE id = ?"
-
+        sql = "UPDATE cars SET ad_date_finished = NULL WHERE id=?"
         try:
-            self.cur.executemany(sql, [car_id])
+            self.cur.execute(sql, [car_id])
             self.con.commit()
             self.cur.close()
         except:

@@ -68,38 +68,45 @@ def get_info_about_car(car_id: str) -> Car:
     r = requests.get(link)
 
     if r.ok:
-        soup = BeautifulSoup(r.text, "html.parser")
-        car = Car(id=car_id)
+        try:
+            soup = BeautifulSoup(r.text, "html.parser")
+            car = Car(id=car_id)
 
-        car.price = int(
-            decimal.Decimal(
-                "".join(
-                    soup.find("span", class_="offer-price__number").text.split()[0:-1]
-                ).replace(",", ".")
-            )
-        )
-        car.ad_date_created = get_date_from_span(
-            soup.find("span", class_="offer-meta__value").text
-        )
-
-        soup_parameters = soup.find(id="parameters")
-        for li in soup_parameters.find_all("li", class_="offer-params__item"):
-            splited_li = li.text.split()
-            if splited_li[0] == "Marka":
-                car.brand = " ".join(splited_li[2::])
-            if splited_li[0] == "Model":
-                car.model = " ".join(splited_li[2::])
-            if splited_li[0] == "Rok":
-                car.production_year = datetime.date(
-                    year=int(splited_li[-1]), month=1, day=1
+            car.price = int(
+                decimal.Decimal(
+                    "".join(
+                        soup.find("span", class_="offer-price__number").text.split()[
+                            0:-1
+                        ]
+                    ).replace(",", ".")
                 )
-            if splited_li[0] == "Przebieg":
-                car.milage = int("".join([x for x in splited_li[1:-1] if x != "km"]))
-            if splited_li[0] == "Uszkodzony":
-                car.is_damaged = True
-            if splited_li[0] == "Oferta":
-                car.from_who = " ".join(splited_li[2::])
-        return car
+            )
+            car.ad_date_created = get_date_from_span(
+                soup.find("span", class_="offer-meta__value").text
+            )
+
+            soup_parameters = soup.find(id="parameters")
+            for li in soup_parameters.find_all("li", class_="offer-params__item"):
+                splited_li = li.text.split()
+                if splited_li[0] == "Marka":
+                    car.brand = " ".join(splited_li[2::])
+                if splited_li[0] == "Model":
+                    car.model = " ".join(splited_li[2::])
+                if splited_li[0] == "Rok":
+                    car.production_year = datetime.date(
+                        year=int(splited_li[-1]), month=1, day=1
+                    )
+                if splited_li[0] == "Przebieg":
+                    car.milage = int(
+                        "".join([x for x in splited_li[1:-1] if x != "km"])
+                    )
+                if splited_li[0] == "Uszkodzony":
+                    car.is_damaged = True
+                if splited_li[0] == "Oferta":
+                    car.from_who = " ".join(splited_li[2::])
+            return car
+        except:
+            return False
     else:
         return False
 
@@ -128,12 +135,13 @@ def get_date_from_span(date: str) -> datetime.datetime:
 
 
 def main():
-    db = Database("test.db")
+    db = Database("otomoto_cars.db")
+    # db = Database("test.db")
 
-    # link_to_otomoto = "https://www.otomoto.pl/osobowe?search%5Bfilter_enum_country_origin%5D=usa&search%5Border%5D=created_at_first%3Adesc"
-    link_to_otomoto = (
-        "https://www.otomoto.pl/osobowe?search%5Bfilter_float_price%3Ato%5D=2000"
-    )
+    link_to_otomoto = "https://www.otomoto.pl/osobowe?search%5Bfilter_enum_country_origin%5D=usa&search%5Border%5D=created_at_first%3Adesc"
+    # link_to_otomoto = (
+    #     "https://www.otomoto.pl/osobowe?search%5Bfilter_float_price%3Ato%5D=2000"
+    # )
 
     number_of_pages = get_number_of_pages(link_to_otomoto)
     cars_ids_from_otomoto = get_cars_id(number_of_pages, link_to_otomoto)
