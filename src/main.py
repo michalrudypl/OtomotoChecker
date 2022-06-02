@@ -13,6 +13,7 @@ class Car(pydantic.BaseModel):
     brand: str = None
     model: str = None
     milage: int = None
+    generation: str = None
     production_year: datetime.date = None
     price: int = None
     from_who: str = None
@@ -92,6 +93,8 @@ def get_info_about_car(car_id: str) -> Car:
                     car.brand = " ".join(splited_li[2::])
                 if splited_li[0] == "Model":
                     car.model = " ".join(splited_li[2::])
+                if splited_li[0] == "Generacja":
+                    car.generation = " ".join(splited_li[1::])
                 if splited_li[0] == "Rok":
                     car.production_year = datetime.date(
                         year=int(splited_li[-1]), month=1, day=1

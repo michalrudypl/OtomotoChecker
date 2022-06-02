@@ -13,6 +13,7 @@ class Database:
                     brand            STRING  NOT NULL,
                     model            STRING  NOT NULL,
                     milage           INTEGER NOT NULL,
+                    generation       TEXT,
                     production_year  INTEGER NOT NULL,
                     price            INTEGER NOT NULL,
                     from_who         BOOLEAN NOT NULL,
@@ -42,6 +43,7 @@ class Database:
                      id,
                      brand,
                      model,
+                     generation,
                      milage,
                      production_year,
                      price,
@@ -50,6 +52,7 @@ class Database:
                      ad_date_created
                  )
                  VALUES (
+                     ?,
                      ?,
                      ?,
                      ?,
@@ -67,6 +70,7 @@ class Database:
                     car.id,
                     car.brand,
                     car.model,
+                    car.generation,
                     car.milage,
                     car.production_year,
                     car.price,
